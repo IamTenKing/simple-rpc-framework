@@ -46,7 +46,9 @@ public class NettyRpcAccessPoint implements RpcAccessPoint {
 
     @Override
     public <T> T getRemoteService(URI uri, Class<T> serviceClass) {
+        //创建连接，向nettyserver
         Transport transport = clientMap.computeIfAbsent(uri, this::createTransport);
+        //创建一个代理类——桩
         return stubFactory.createStub(transport, serviceClass);
     }
 
@@ -63,10 +65,13 @@ public class NettyRpcAccessPoint implements RpcAccessPoint {
         return uri;
     }
 
+    //开启netty server服务端
     @Override
     public synchronized Closeable startServer() throws Exception {
         if (null == server) {
+            //利用ServiceSupport，spi 插件化动态加载服务类，目前传输只有NettyServer一种类型
             server = ServiceSupport.load(TransportServer.class);
+            //开启netty server
             server.start(RequestHandlerRegistry.getInstance(), port);
 
         }

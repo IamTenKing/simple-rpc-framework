@@ -49,7 +49,9 @@ public class NettyServer implements TransportServer {
         EventLoopGroup acceptEventGroup = newEventLoopGroup();
         EventLoopGroup ioEventGroup = newEventLoopGroup();
         ChannelHandler channelHandlerPipeline = newChannelHandlerPipeline();
+        //新建netty serverBootstrap
         ServerBootstrap serverBootstrap = newBootstrap(channelHandlerPipeline, acceptEventGroup, ioEventGroup);
+        //serverBootstrap绑定端口
         Channel channel = doBind(serverBootstrap);
 
         this.acceptEventGroup = acceptEventGroup;
@@ -78,6 +80,13 @@ public class NettyServer implements TransportServer {
     }
 
     private EventLoopGroup newEventLoopGroup() {
+
+//        Netty的 epoll transport使用 epoll edge-triggered 而 java的 nio 使用 level-triggered
+//        Netty的 epoll transport 暴露了更多的nio没有的配置参数， 如 TCP_CORK, SO_REUSEADDR等。
+//        C代码，更少GC，更少synchronized
+//        总之，linux上使用EpollEventLoopGroup会有较少的gc有更高级的特性，性能更好~！
+//
+//        那该如何使用native socket transport（epoll）呢？
         if (Epoll.isAvailable()) {
             return new EpollEventLoopGroup();
         } else {

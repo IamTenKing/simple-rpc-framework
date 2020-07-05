@@ -13,10 +13,7 @@
  */
 package com.github.liyue2008.rpc.spi;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ServiceLoader;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -28,6 +25,8 @@ import java.util.stream.StreamSupport;
 public class ServiceSupport {
     private final static Map<String, Object> singletonServices = new HashMap<>();
     public synchronized static <S> S load(Class<S> service) {
+
+        //ServiceLoader.load加载接口类的META-INF文件下的实现类
         return StreamSupport.
                 stream(ServiceLoader.load(service).spliterator(), false)
                 .map(ServiceSupport::singletonFilter)

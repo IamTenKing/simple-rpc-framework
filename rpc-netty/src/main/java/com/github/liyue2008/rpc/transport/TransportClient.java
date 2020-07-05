@@ -20,6 +20,19 @@ import java.net.SocketAddress;
 import java.util.concurrent.TimeoutException;
 
 /**
+ *在java.io.包下 InputStream，outputStream, Reader, Writer 等基类都实现了Closeable接口，因为每次的IO操作结束之后都要去释放资源。
+ *
+ * 1： 如果在调用此方法之前 stream已经关闭 ，则方法失效；
+ * 2：建议先关闭内部的资源，并标记为已关闭；
+ * 3：优先抛出IO异常；
+ *
+ *
+ * 比如AutoCloseableObjecct 实现Closeable
+ * 那么代码中就可以在try使用该对象，close会自动调用
+ * 		try(AutoCloseableObjecct app = new AutoCloseableObjecct()){
+ *
+ *                }catch (Exception e) {
+ *        }
  * @author LiYue
  * Date: 2019/9/25
  */

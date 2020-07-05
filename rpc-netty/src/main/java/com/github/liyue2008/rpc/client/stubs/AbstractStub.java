@@ -26,6 +26,7 @@ import com.github.liyue2008.rpc.transport.command.ResponseHeader;
 import java.util.concurrent.ExecutionException;
 
 /**
+ * 远程调用的逻辑抽取在AbstractStub中
  * @author LiYue
  * Date: 2019/9/27
  */
@@ -35,8 +36,10 @@ public abstract class AbstractStub implements ServiceStub {
     protected byte [] invokeRemote(RpcRequest request) {
         Header header = new Header(ServiceTypes.TYPE_RPC_REQUEST, 1, RequestIdSupport.next());
         byte [] payload = SerializeSupport.serialize(request);
+        //Command就是自定义的消息传输对象，保护请求头，请求体
         Command requestCommand = new Command(header, payload);
         try {
+            //请求是异步请求，返回CompletableFuture对象，但是get方法是阻塞的，直到有结果才返回
             Command responseCommand = transport.send(requestCommand).get();
             ResponseHeader responseHeader = (ResponseHeader) responseCommand.getHeader();
             if(responseHeader.getCode() == Code.SUCCESS.getCode()) {

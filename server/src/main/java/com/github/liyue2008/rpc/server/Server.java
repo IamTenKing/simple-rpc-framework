@@ -38,12 +38,16 @@ public class Server {
         HelloService helloService = new HelloServiceImpl();
         logger.info("创建并启动RpcAccessPoint...");
         try(RpcAccessPoint rpcAccessPoint = ServiceSupport.load(RpcAccessPoint.class);
+            //开启netty server,监听端口
             Closeable ignored = rpcAccessPoint.startServer()) {
+            //注册中心启动
             NameService nameService = rpcAccessPoint.getNameService(file.toURI());
             assert nameService != null;
             logger.info("向RpcAccessPoint注册{}服务...", serviceName);
+            //实际上就是将hello服务实例put到server的一个map里面
             URI uri = rpcAccessPoint.addServiceProvider(helloService, HelloService.class);
             logger.info("服务名: {}, 向NameService注册...", serviceName);
+            //nameSevice可以有多个实现类，用spi动态加载实现类，目前只有本地文件实现的方式
             nameService.registerService(serviceName, uri);
             logger.info("开始提供服务，按任何键退出.");
             //noinspection ResultOfMethodCallIgnored

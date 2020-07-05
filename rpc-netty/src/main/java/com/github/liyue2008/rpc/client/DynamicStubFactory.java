@@ -20,6 +20,8 @@ import com.itranswarp.compiler.JavaStringCompiler;
 import java.util.Map;
 
 /**
+ *
+ * 动态代理的核心就是为某个接口动态生成代理类，为调用接口封装远程调用的逻辑
  * @author LiYue
  * Date: 2019/9/27
  */
@@ -52,11 +54,16 @@ public class DynamicStubFactory implements StubFactory{
             String classFullName = serviceClass.getName();
             String stubFullName = "com.github.liyue2008.rpc.client.stubs." + stubSimpleName;
             String methodName = serviceClass.getMethods()[0].getName();
+            //入参类型
+            Class<?>[] parameterTypes = serviceClass.getMethods()[0].getParameterTypes();
+            //返回值类型
+            Class<?> returnType = serviceClass.getMethods()[0].getReturnType();
 
             String source = String.format(STUB_SOURCE_TEMPLATE, stubSimpleName, classFullName, methodName, classFullName, methodName);
             // 编译源代码
             JavaStringCompiler compiler = new JavaStringCompiler();
             Map<String, byte[]> results = compiler.compile(stubSimpleName + ".java", source);
+
             // 加载编译好的类
             Class<?> clazz = compiler.loadClass(stubFullName, results);
 

@@ -48,6 +48,7 @@ public class LocalFileNameService implements NameService {
     @Override
     public void connect(URI nameServiceUri) {
         if(schemes.contains(nameServiceUri.getScheme())) {
+            //通过地址读取配置文件
             file = new File(nameServiceUri);
         } else {
             throw new RuntimeException("Unsupported scheme!");
